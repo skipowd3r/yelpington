@@ -79,11 +79,15 @@
   .resto-name {
     font-weight: bold;
     cursor: pointer;
-    margin: 20px;
-    padding: 10px;
+    padding: 10px 5px 0px 10px;
     border-bottom: solid lightgray 1px;
     color: purple;
-
+  }
+  .resto-italic {
+    font-style: italic;
+    font-weight: lighter;
+    color: lightgray;
+    padding: 0px 5px 10px 15px;
   }
 
   .resto-name:hover {
@@ -115,7 +119,10 @@
     background-color: white;
     color: purple;
   }
-
+.purpletext{
+  background-color: purple;
+  color: white;
+}
   #popupButton {
     border: 0px;
     padding: 0px;
@@ -193,7 +200,7 @@
             .then(response => { return response.json() })
             .then(restaurant => {
               addMarker({ restaurant })
-              document.getElementById("restaurants").innerHTML += `<div id='${restaurant.id}' class="resto-name" onclick='getInfo("${filename}")'> ${restaurant.name} </div> <br>`;
+              document.getElementById("restaurants").innerHTML += `<div id='${restaurant.id}' class="resto-name" onclick='getInfo("${filename}")'> ${restaurant.name} <p class="resto-italic">${restaurant.notes[0]}</p></div> <br>`;
             })
         })
       });
@@ -206,7 +213,7 @@
       .then(json => {
         document.getElementById('locationheader').innerHTML = "";
         document.getElementById('restaurants').className = "infopage";
-        document.getElementById('restaurants').innerHTML = `<h1>${json.name}</h1> <h2>Address:</h2> ${json.address} <h2>Phone:</h2> ${json.phone} <h2>Website:</h2> ${json.website} <h2>Notes:</h2> ${json.notes.join(" <br> ")} </div>`;
+        document.getElementById('restaurants').innerHTML = `<h1 class="purpletext">${json.name}</h1> <h2>Address:</h2> ${json.address} <h2>Phone:</h2> ${json.phone} <h2>Website:</h2> ${json.website} <h2>Notes:</h2> ${json.notes.join(" <br> ")} </div>`;
         console.log(json.id)
       });
   }
