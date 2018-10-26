@@ -6,157 +6,253 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
-  crossorigin="" />
-<script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js" integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
-  crossorigin=""></script>
+    crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js" integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+    crossorigin=""></script>
   <title>Fetching Data</title>
 </head>
 
 <style>
-h1 {
-  font-size: 24px;
-  font-family: Arial, Helvetica, sans-serif;
-}
-#pagecontainer {
-  display: grid;
-  grid-template-columns: 400px auto;
-  grid-template-areas: 
-  "logo title"
-  "restaurants map"
-}
+  h1 {
+    font-size: 24px;
+    font-family: Arial, Helvetica, sans-serif;
+  }
 
-#logo {
-  grid-area: logo;
-  justify-self: start;
-}
-#title {
-  grid-area: title;
-  justify-self: center;
-}
-#restaurants {
-  grid-area: restaurants;
-}
-#restoinfo {
-  grid-area: restoinfo;
-}
-#map {
-  height: 500px;
-}
 
+  #pagecontainer {
+    display: grid;
+    grid-template-columns: 400px auto;
+    height: 400px;
+    grid-template-areas:
+      "header header"
+      "list map"
+  }
+
+  #header {
+    grid-area: header;
+    border-bottom: solid 12px lightgrey;
+    color: white;
+    text-align: center;
+    font-size: 50px;
+    font-family: Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-transform: lowercase;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: purple;
+    padding: 20px;
+  }
+
+  #logo {
+    grid-area: logo;
+    justify-self: start;
+
+  }
+
+  #title {
+    grid-area: title;
+    justify-self: center;
+  }
+
+  #list {
+    height: 450px;
+    overflow: auto;
+    border-bottom: solid 12px lightgrey;
+
+  }
+
+  .infopage {
+    padding: 10px 20px 50px 20px;
+    color: purple;
+  }
+
+  #restaurants {
+    grid-area: restaurants;
+    font-family: Arial, Helvetica, sans-serif;
+    border-right: 1px lightgray solid;
+    background: blur(2px);
+    position: relative;
+    overflow: auto;
+  }
+
+  .resto-name {
+    font-weight: bold;
+    cursor: pointer;
+    margin: 20px;
+    padding: 10px;
+    border-bottom: solid lightgray 1px;
+    color: purple;
+
+  }
+
+  .resto-name:hover {
+    background-color: purple;
+    color: white;
+  }
+
+  #map {
+    height: 450px;
+    border-bottom: solid 12px lightgrey;
+
+  }
+
+  #locationheader {
+    font-family: Arial, Helvetica, sans-serif;
+    border-bottom: solid lightgray 1px;
+    padding: 20px 20px 20px 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  #backbutton {
+    background-color: purple;
+    color: white;
+    border: 0px
+  }
+
+  #backbutton:hover {
+    background-color: white;
+    color: purple;
+  }
+
+  #popupButton {
+    border: 0px;
+    padding: 0px;
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: purple;
+  }
+
+  #popupButton:hover {
+    background-color: purple;
+    color: white;
+  }
 </style>
 
 <body>
-<header>
 
-</header>
-<div id="pagecontainer">
-  <div id="logo"><h1>Yelpington</h1>
-    <button id="backbutton" onclick="populatePage()">Back to List</button>
+
+  <div id="pagecontainer">
+    <header id="header">
+      <div id="logo"><button id="backbutton" onclick="populatePage()">
+          <h1>Yelpington</h1>
+        </button>
+      </div>
+      <div id="title">
+        <h1>Find the Best Restaurants in 05401</h1>
+      </div>
+    </header>
+    <div id="list">
+      <div id="locationheader">
+        <h1>Burlington, VT</h1>
+      </div>
+      <div id="restaurants"></div>
+
+
+    </div>
+    <div id="map"></div>
+
   </div>
-  <div id="title"><h1>Burlington, VT</h1></div>
-  <div id="restaurants"><h1>List of Restaurants</h1></div>
-  <div id="map"></div>
-  
-</div>
 
 </body>
 
 <script>
-let name = document.location.pathname.slice(1);
+  let name = document.location.pathname.slice(1);
 
-if (!name) {
-  console.log("no place name specfied");
-  populatePage();
-
-} else {
-  
-  console.log("fetching place named '" + name + "'");
-  fetch(name)
-    .then(function (response) {
-      return response.text();
-    })
-    .then(function (myText) {
-      console.log(myText);
-    });
-}
+  if (!name) {
+    console.log("no place name specfied");
+    populatePage();
+    makeMap('150 Main St, Burlington VT 05401');
 
 
-function populatePage(){
-  makeMap('150 Main St, Burlington VT 05401');
-  document.getElementById('restaurants').innerHTML="<h1>List of Restaurants</h1>";
-  fetch('all.json')
-  .then(response => response.json())
-  .then(all => all.forEach(resto => {
-    console.log(`${resto}`)
-    let filename = `${resto}.json`
-    fetch(filename)
-    .then(response => {return response.json()})
-    .then(restaurant => {
-      addMarker({restaurant})
-      document.getElementById("restaurants").innerHTML +=  `<div onclick='getInfo("${filename}")'> ${restaurant.name} </div> <br>`;
-    })
-    }));
-}
-
-
-function getInfo(filename){
-  fetch(filename)
-  .then(response => response.json())
-  .then(json => {
-    document.getElementById('restaurants').innerHTML = `<div> <h1>${json.name}</h1> <h2>Address:</h2> ${json.address} <h2>Phone:</h2> ${json.phone} <h2>Website:</h2> ${json.website} <h2>Notes:</h2> ${json.notes.join(" <br> ")} </div>`;
-    //makeMap(`${json.address}`);
-    //addMarker(`${json.address}`)
-  });
-}
-
-
-function makeMap(address){
-  console.log({address})
-  let encodedAddress = encodeURIComponent(address)
-  console.log({encodedAddress})
-
-  fetch(`https://nominatim.openstreetmap.org/search/?q=${encodedAddress}&format=json`)
-  .then(response => {return response.json()})
-  .then(result => {
-      let coords = [result[0].lat, result[0].lon];
-      mymap = L.map('map').setView(coords, 15.5);
-      L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        maxZoom: 20,
-        id: 'mapbox.streets',
-        accessToken: 'pk.eyJ1Ijoic2tpcG93ZDNyIiwiYSI6ImNqbm5hYnQ3cDAwZ3gzcXRhanllOGJ4MzEifQ.T1lUzD4Hs3pcOdKFlREpAg'
-      }).addTo(mymap);
-})}
-
-function addMarker({restaurant}){
-  if (!checkBTVAddress(restaurant.address)){
-    restaurant.address += " 05401";
-  }
-  console.log(restaurant.address)
-
-  let encodedAddress = encodeURIComponent(restaurant.address)
-  console.log({encodedAddress})  
-
-  fetch(`https://nominatim.openstreetmap.org/search/?q=${encodedAddress}&format=json`)
-  .then(response => {return response.json()})
-  .then(result => {
-    let coords = [result[0].lat, result[0].lon];
-    restaurant.coords = coords;
-    console.log(restaurant.coords)
-
-    let marker = L.marker(coords).addTo(mymap);
-    marker.bindPopup(`<b>${restaurant.name}</b> <br> ${restaurant.address} <br> ${restaurant.phone} <br> ${restaurant.website} <br> ${restaurant.notes.join('<br>')}`);
-
-  })
-}
-
-
-function checkBTVAddress(address){
-  if(address.includes("05401")){
-    return true;
   } else {
-      return false;
+
+    console.log("fetching place named '" + name + "'");
+    fetch(name)
+      .then(function (response) {
+        return response.text();
+      })
+      .then(function (myText) {
+        console.log(myText);
+      });
   }
-}
+
+
+  function populatePage() {
+    document.getElementById('locationheader').innerHTML = "<h1>Burlington, VT</h1>";
+    document.getElementById('restaurants').innerHTML = "";
+    fetch('all.json')
+      .then(response => response.json())
+      .then(all => {
+        document.getElementById('locationheader').innerHTML += `${all.length} Places` + "<br><br>";
+        all.forEach(resto => {
+          let filename = `${resto}.json`
+
+          fetch(filename)
+            .then(response => { return response.json() })
+            .then(restaurant => {
+              addMarker({ restaurant })
+              document.getElementById("restaurants").innerHTML += `<div id='${restaurant.id}' class="resto-name" onclick='getInfo("${filename}")'> ${restaurant.name} </div> <br>`;
+            })
+        })
+      });
+  }
+
+
+  function getInfo(filename) {
+    fetch(filename)
+      .then(response => response.json())
+      .then(json => {
+        document.getElementById('locationheader').innerHTML = "";
+        document.getElementById('restaurants').className = "infopage";
+        document.getElementById('restaurants').innerHTML = `<h1>${json.name}</h1> <h2>Address:</h2> ${json.address} <h2>Phone:</h2> ${json.phone} <h2>Website:</h2> ${json.website} <h2>Notes:</h2> ${json.notes.join(" <br> ")} </div>`;
+        console.log(json.id)
+      });
+  }
+
+  function makeMap(address) {
+    //document.getElementById('map').innerHTML="";
+    let encodedAddress = encodeURIComponent(address)
+    fetch(`https://nominatim.openstreetmap.org/search/?q=${encodedAddress}&format=json`)
+      .then(response => { return response.json() })
+      .then(result => {
+        let coords = [result[0].lat, result[0].lon];
+        mymap = L.map('map').setView(coords, 15.5);
+        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+          attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+          maxZoom: 20,
+          id: 'mapbox.streets',
+          accessToken: 'pk.eyJ1Ijoic2tpcG93ZDNyIiwiYSI6ImNqbm5hYnQ3cDAwZ3gzcXRhanllOGJ4MzEifQ.T1lUzD4Hs3pcOdKFlREpAg'
+        }).addTo(mymap);
+      })
+  }
+
+  function addMarker({ restaurant }) {
+    if (!checkBTVAddress(restaurant.address)) {
+      restaurant.address += " 05401";
+    }
+    let encodedAddress = encodeURIComponent(restaurant.address)
+
+    fetch(`https://nominatim.openstreetmap.org/search/?q=${encodedAddress}&format=json`)
+      .then(response => { return response.json() })
+      .then(result => {
+        let coords = [result[0].lat, result[0].lon];
+        restaurant.coords = coords;
+        let marker = L.marker(coords).addTo(mymap);
+        let filename = `${restaurant.id}.json`;
+        marker.bindPopup(`<button id="popupButton" onclick='getInfo("${filename}")'><b>${restaurant.name}</b></button><br> ${restaurant.address} <br>`);
+
+      })
+  }
+
+
+  function checkBTVAddress(address) {
+    if (address.includes("05401")) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
 </script>
