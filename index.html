@@ -20,16 +20,26 @@ h1 {
 #pagecontainer {
   display: grid;
   grid-template-columns: 300px auto;
-  grid-template-areas: "restaurants info"
+  grid-template-areas: 
+  "logo title"
+  "restaurants restoinfo"
+}
+
+#logo {
+  grid-area: logo;
+  justify-self: start;
+}
+#title {
+  grid-area: title;
+  justify-self: center;
 }
 #restaurants {
   grid-area: restaurants;
 }
-#info {
-  grid-area: info;
+#restoinfo {
+  grid-area: restoinfo;
 }
 #map {
-  grid-area: info;
   height: 500px;
 }
 
@@ -40,11 +50,13 @@ h1 {
 
 </header>
 <div id="pagecontainer">
+  <div id="logo"><h1>Yelpington</h1></div>
+  <div id="title"><h1>Burlington, VT</h1></div>
   <div id="restaurants"><h1>List of Restaurants</h1></div>
-  <div>
-    <h1>Info:</h1> 
+  <div id="restoinfo">
     <div id="map"></div>
-    <div id="info"></div>
+    <div id="info"> 
+    </div>
   </div>
 </div>
 
@@ -71,7 +83,7 @@ if (!name) {
 
 
 function populatePage(){
-  makeMap('152 Main St, Burlington VT 05401');
+  makeMap('150 Main St, Burlington VT 05401');
 
   fetch('all.json')
   .then(response => response.json())
@@ -81,6 +93,7 @@ function populatePage(){
     fetch(filename)
     .then(response => {return response.json()})
     .then(restaurant => {
+      addMarker({restaurant})
       document.getElementById("restaurants").innerHTML +=  `<div onclick='getInfo("${filename}")'> ${restaurant.name} </div> <br>`;
     })
     }));
@@ -93,7 +106,7 @@ function getInfo(filename){
   .then(json => {
     document.getElementById('info').innerHTML = `<div> <h1>${json.name}</h1> <h2>Address:</h2> ${json.address} <h2>Phone:</h2> ${json.phone} <h2>Website:</h2> ${json.website} <h2>Notes:</h2> ${json.notes.join(" <br> ")} </div>`;
     //makeMap(`${json.address}`);
-    addMarker(`${json.address}`)
+    //addMarker(`${json.address}`)
   });
 }
 
@@ -107,25 +120,44 @@ function makeMap(address){
   .then(response => {return response.json()})
   .then(result => {
       let coords = [result[0].lat, result[0].lon];
-      mymap = L.map('map').setView(coords, 15);
+      mymap = L.map('map').setView(coords, 15.5);
       L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        maxZoom: 18,
+        maxZoom: 20,
         id: 'mapbox.streets',
         accessToken: 'pk.eyJ1Ijoic2tpcG93ZDNyIiwiYSI6ImNqbm5hYnQ3cDAwZ3gzcXRhanllOGJ4MzEifQ.T1lUzD4Hs3pcOdKFlREpAg'
       }).addTo(mymap);
 })}
 
-function addMarker(address){
-  console.log({address})
-  let encodedAddress = encodeURIComponent(address)
+function addMarker({restaurant}){
+  if (!checkBTVAddress(restaurant.address)){
+    restaurant.address += " 05401";
+  }
+  console.log(restaurant.address)
+
+  let encodedAddress = encodeURIComponent(restaurant.address)
   console.log({encodedAddress})  
+
   fetch(`https://nominatim.openstreetmap.org/search/?q=${encodedAddress}&format=json`)
   .then(response => {return response.json()})
   .then(result => {
     let coords = [result[0].lat, result[0].lon];
+    restaurant.coords = coords;
+    console.log(restaurant.coords)
+
     let marker = L.marker(coords).addTo(mymap);
+    marker.bindPopup(`<b>${restaurant.name}</b> <br> ${restaurant.address} <br> ${restaurant.phone} <br> ${restaurant.website} <br> ${restaurant.notes.join('<br>')}`);
+
   })
+}
+
+
+function checkBTVAddress(address){
+  if(address.includes("05401")){
+    return true;
+  } else {
+      return false;
+  }
 }
 
 </script>
